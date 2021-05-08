@@ -19,15 +19,9 @@ const Import: React.FC = () => {
 
   async function submitFile(): Promise<void> {
     const data = new FormData();
-    console.log('submitFile:', uploadedFiles);
-
-    const filesToSubmit: File[] = [];
-
-    //uploadedFiles.map((uploaded) => filesToSubmit.push(uploaded.file));
 
     data.append('file', uploadedFiles[0].file);
 
-    console.log('Data', data);
     try {
       await api.post('/transactions/import', data, {
         headers: {
@@ -35,7 +29,7 @@ const Import: React.FC = () => {
         },
       });
     } catch (err) {
-      // console.log(err.response.error);
+      console.log(err.response.error);
     }
   }
 
