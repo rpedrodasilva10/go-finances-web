@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-
-import filesize from 'filesize';
-
-import Header from '../../components/Header';
-import FileList from '../../components/FileList';
-import Upload from '../../components/Upload';
-
-import { Container, Title, ImportFileContainer, Footer } from './styles';
-
 import alert from '../../assets/alert.svg';
+import FileList from '../../components/FileList';
+import Header from '../../components/Header';
+import Upload from '../../components/Upload';
 import api from '../../services/api';
+import { Container, Footer, ImportFileContainer, Title } from './styles';
 
 interface FileProps {
   file: File;
@@ -22,20 +17,39 @@ const Import: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
   const history = useHistory();
 
-  async function handleUpload(): Promise<void> {
-    // const data = new FormData();
+  async function submitFile(): Promise<void> {
+    const data = new FormData();
+    console.log('submitFile:', uploadedFiles);
 
-    // TODO
+    const filesToSubmit: File[] = [];
 
+    //uploadedFiles.map((uploaded) => filesToSubmit.push(uploaded.file));
+
+    data.append('file', uploadedFiles[0].file);
+
+    console.log('Data', data);
     try {
-      // await api.post('/transactions/import', data);
+      await api.post('/transactions/import', data, {
+        headers: {
+          'Content-Type': `multipart/form-data;`,
+        },
+      });
     } catch (err) {
       // console.log(err.response.error);
     }
   }
 
-  function submitFile(files: File[]): void {
-    // TODO
+  function handleUpload(files: File[]): void {
+    console.log('handleUpload');
+    console.log(files);
+
+    const returnedFileProps: FileProps[] = [];
+
+    if (files) {
+      files.map((file) => returnedFileProps.push({ file, name: file.name, readableSize: file.size.toString() }));
+
+      setUploadedFiles([...uploadedFiles, ...returnedFileProps]);
+    }
   }
 
   return (
@@ -44,7 +58,7 @@ const Import: React.FC = () => {
       <Container>
         <Title>Importar uma transação</Title>
         <ImportFileContainer>
-          <Upload onUpload={submitFile} />
+          <Upload onUpload={handleUpload} />
           {!!uploadedFiles.length && <FileList files={uploadedFiles} />}
 
           <Footer>
@@ -52,7 +66,7 @@ const Import: React.FC = () => {
               <img src={alert} alt="Alert" />
               Permitido apenas arquivos CSV
             </p>
-            <button onClick={handleUpload} type="button">
+            <button onClick={submitFile} type="button">
               Enviar
             </button>
           </Footer>
