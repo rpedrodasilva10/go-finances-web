@@ -4,6 +4,7 @@ import outcome from '../../assets/outcome.svg';
 import total from '../../assets/total.svg';
 import Header from '../../components/Header';
 import api from '../../services/api';
+import formatValue from '../../utils/formatValue';
 import { Card, CardContainer, Container, TableContainer } from './styles';
 
 interface TransactionWrapper {
@@ -36,10 +37,8 @@ const Dashboard: React.FC = () => {
       const response = await api.get<TransactionWrapper>('/transactions');
 
       // Trata formatação da data de valor
-      response.data.transactions.map((transaction) => {
-        transaction.formattedValue = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-          transaction.value
-        );
+      response.data.transactions.map(transaction => {
+        transaction.formattedValue = formatValue(transaction.value);
         transaction.formattedDate = new Date(transaction.created_at).toLocaleDateString();
       });
 
@@ -63,27 +62,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">
-              {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance.income)}
-            </h1>
+            <h1 data-testid="balance-income">{formatValue(balance.income)}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">
-              {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance.outcome)}
-            </h1>
+            <h1 data-testid="balance-outcome">{formatValue(balance.outcome)}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">
-              {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance.total)}
-            </h1>
+            <h1 data-testid="balance-total">{formatValue(balance.total)}</h1>
           </Card>
         </CardContainer>
 
@@ -99,7 +92,7 @@ const Dashboard: React.FC = () => {
             </thead>
 
             <tbody>
-              {transactions.map((transaction) => {
+              {transactions.map(transaction => {
                 return (
                   <tr key={transaction.id}>
                     <td className="title">{transaction.title}</td>
