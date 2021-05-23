@@ -12,6 +12,8 @@ const App: React.FC = () => (
       <Routes />
     </Router>
   </>
+
+  
 );
 
 export default App;
